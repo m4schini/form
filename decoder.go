@@ -51,6 +51,14 @@ func NewDecoder[T any]() (*Decoder[T], error) {
 	return &decoder, nil
 }
 
+func MustDecoder[T any]() *Decoder[T] {
+	d, err := NewDecoder[T]()
+	if err != nil {
+		panic(err)
+	}
+	return d
+}
+
 type InvalidTypeErr struct {
 	Kind reflect.Kind
 }
