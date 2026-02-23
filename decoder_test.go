@@ -1,4 +1,4 @@
-package decoder
+package form
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	. "codeberg.org/aur0ra/form"
 	"codeberg.org/aur0ra/form/field"
 )
 

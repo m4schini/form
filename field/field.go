@@ -1,31 +1,29 @@
-package form
+package field
 
 import (
+	"fmt"
 	"net/url"
 	"reflect"
 )
 
-type field struct {
+type Field struct {
 	Decoder     FieldDecoder
-	MetaData    fieldTag
+	MetaData    Tag
 	StructField reflect.StructField
 	_fieldName  string
 }
 
-func newField(f reflect.StructField) (field, error) {
-	md := parseFieldTag(f.Tag.Get(structTageName))
+func New(f reflect.StructField) (Field, error) {
+	md := ParseTag(f.Tag.Get(TagName))
 
-	fieldName := f.Name
-	if md.Alias != "" {
-		fieldName = md.Alias
-	}
+	fieldName := md.FieldName(f.Name)
 
 	decoder, err := decoderFor(f.Type)
 	if err != nil {
-		return field{}, err
+		return Field{}, err
 	}
 
-	return field{
+	return Field{
 		Decoder:     decoder,
 		MetaData:    md,
 		StructField: f,
@@ -33,7 +31,7 @@ func newField(f reflect.StructField) (field, error) {
 	}, nil
 }
 
-func (f *field) Decode(values url.Values, target reflect.Value) error {
+func (f *Field) Decode(values url.Values, target reflect.Value) error {
 	entries, exists := values[f._fieldName]
 	if !exists || len(entries) == 0 {
 		if f.MetaData.Required {
@@ -113,4 +111,20 @@ func decoderFor(t reflect.Type) (FieldDecoder, error) {
 	}
 
 	return nil, MissingDecoderErr{Kind: k}
+}
+
+type RequiredFieldMissingErr struct {
+	Field string
+}
+
+func (r RequiredFieldMissingErr) Error() string {
+	return fmt.Sprintf("required field is missing: %v", r.Field)
+}
+
+type MissingDecoderErr struct {
+	Kind reflect.Kind
+}
+
+func (i MissingDecoderErr) Error() string {
+	return fmt.Sprintf("type has no decoder: %s", i.Kind.String())
 }

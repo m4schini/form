@@ -1,26 +1,38 @@
-package form
+package field
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-type fieldTag struct {
+const (
+	TagName = "form"
+)
+
+type Tag struct {
 	Alias    string
 	Required bool
-	Regex    string
+	Regex    *regexp.Regexp
 }
 
-func parseFieldTag(tag string) fieldTag {
+func (t Tag) FieldName(fieldName string) string {
+	if t.Alias != "" {
+		fieldName = t.Alias
+	}
+	return fieldName
+}
+
+func ParseTag(tag string) Tag {
 	if tag == "" {
-		return fieldTag{}
+		return Tag{}
 	}
 	parts := strings.Split(tag, ",")
 	if len(parts) == 0 {
-		return fieldTag{}
+		return Tag{}
 	}
 	if len(parts) == 1 {
-		return fieldTag{Alias: parts[0]}
+		return Tag{Alias: parts[0]}
 	}
 	if len(parts) == 2 {
 		aliasPart := parts[0]
@@ -34,8 +46,8 @@ func parseFieldTag(tag string) fieldTag {
 			}
 		}
 
-		return fieldTag{Alias: aliasPart, Required: required}
+		return Tag{Alias: aliasPart, Required: required}
 	}
 
-	return fieldTag{}
+	return Tag{}
 }

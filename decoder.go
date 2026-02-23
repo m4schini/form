@@ -1,4 +1,4 @@
-package decoder
+package form
 
 import (
 	"fmt"
