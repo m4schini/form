@@ -60,7 +60,7 @@ Custom types can be decoded when they implement `field.Parser`.
 
 ```go
 type Parser interface {
-	Parse(field string) (any, error)
+	ParseForm(field string) (any, error)
 }
 ```
 Parser must return the custom type or nil.

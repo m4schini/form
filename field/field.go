@@ -47,7 +47,7 @@ func (f *Field) Decode(values url.Values, target reflect.Value) error {
 	}
 	value := entries[0]
 
-	v, err := f.Parser.Parse(value)
+	v, err := f.Parser.ParseForm(value)
 	if err != nil {
 		return err
 	}
