@@ -56,7 +56,7 @@ func (d Date) String() string {
 	return time.Time(d).String()
 }
 
-func (d Date) DecodeForm(field string) (any, error) {
+func (d Date) Parse(field string) (any, error) {
 	t, err := time.Parse("2006-01-02", field)
 	return Date(t), err
 }

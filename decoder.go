@@ -17,7 +17,7 @@ func (d *Decoder[T]) Decode(values url.Values) (decoded T, err error) {
 	e := dp.Elem()
 
 	for _, f := range d.fields {
-		err = f.Decode(values, e.FieldByName(f.StructField.Name))
+		err = f.Decode(values, e.FieldByName(f.Name))
 		if err != nil {
 			return decoded, err
 		}

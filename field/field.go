@@ -6,11 +6,16 @@ import (
 	"reflect"
 )
 
+// Field contains the metadata and type parser to decode a key-value pair from url.Values into a struct field.
 type Field struct {
-	Decoder     FieldDecoder
-	MetaData    Tag
-	StructField reflect.StructField
-	_fieldName  string
+	// Name is the name of the field inside the struct
+	Name string
+	// Parser used to turn string value into Field type
+	Parser Parser
+	// MetaData contains additional Tag metadata used during decoding
+	MetaData Tag
+	// _fieldName is the key used during Decode to get the value from url.Values
+	_fieldName string
 }
 
 func New(f reflect.StructField) (Field, error) {
@@ -18,19 +23,20 @@ func New(f reflect.StructField) (Field, error) {
 
 	fieldName := md.FieldName(f.Name)
 
-	decoder, err := decoderFor(f.Type)
+	parser, err := parserFor(f.Type)
 	if err != nil {
 		return Field{}, err
 	}
 
 	return Field{
-		Decoder:     decoder,
-		MetaData:    md,
-		StructField: f,
-		_fieldName:  fieldName,
+		Name:       f.Name,
+		Parser:     parser,
+		MetaData:   md,
+		_fieldName: fieldName,
 	}, nil
 }
 
+// Decode retrieves value from url.Values, converts its value into the target type and then sets the value on target
 func (f *Field) Decode(values url.Values, target reflect.Value) error {
 	entries, exists := values[f._fieldName]
 	if !exists || len(entries) == 0 {
@@ -41,7 +47,7 @@ func (f *Field) Decode(values url.Values, target reflect.Value) error {
 	}
 	value := entries[0]
 
-	v, err := f.Decoder.DecodeForm(value)
+	v, err := f.Parser.Parse(value)
 	if err != nil {
 		return err
 	}
@@ -50,10 +56,11 @@ func (f *Field) Decode(values url.Values, target reflect.Value) error {
 	return nil
 }
 
-func decoderFor(t reflect.Type) (FieldDecoder, error) {
+// parserFor is a factory method that returns the correct parser to convert string into type t.
+func parserFor(t reflect.Type) (Parser, error) {
 	if t.Implements(fieldDecoderType) {
 		v := reflect.New(t)
-		return v.Interface().(FieldDecoder), nil
+		return v.Interface().(Parser), nil
 	}
 
 	k := t.Kind()
@@ -91,26 +98,30 @@ func decoderFor(t reflect.Type) (FieldDecoder, error) {
 	case reflect.Complex128:
 		return Complex128Decoder{}, nil
 	case reflect.Array:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Slice:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Interface:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Struct:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Chan:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Func:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Map:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.Pointer:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
 	case reflect.UnsafePointer:
-		return nil, MissingDecoderErr{Kind: k}
+		return nil, CannotParseErr{Kind: k}
+	case reflect.Invalid:
+		return nil, CannotParseErr{Kind: k}
+	case reflect.Uintptr:
+		return nil, CannotParseErr{Kind: k}
 	}
 
-	return nil, MissingDecoderErr{Kind: k}
+	return nil, CannotParseErr{Kind: k}
 }
 
 type RequiredFieldMissingErr struct {
@@ -121,10 +132,10 @@ func (r RequiredFieldMissingErr) Error() string {
 	return fmt.Sprintf("required field is missing: %v", r.Field)
 }
 
-type MissingDecoderErr struct {
+type CannotParseErr struct {
 	Kind reflect.Kind
 }
 
-func (i MissingDecoderErr) Error() string {
-	return fmt.Sprintf("type has no decoder: %s", i.Kind.String())
+func (i CannotParseErr) Error() string {
+	return fmt.Sprintf("type has no parser: %s", i.Kind.String())
 }

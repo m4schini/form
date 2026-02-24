@@ -10,12 +10,17 @@ const (
 	TagName = "form"
 )
 
+// Tag represents the configuration options that can be with the struct tag (see TagName) set on struct fields.
 type Tag struct {
-	Alias    string
+	// If Alias is not an empty string, it will be used instead of the struct field name.
+	Alias string
+	// If Required is true decode will fail if FieldName is not present in url.Values.
 	Required bool
-	Regex    *regexp.Regexp
+	// If Regex is not nil it will be used to validate the field value before decoding it.
+	Regex *regexp.Regexp
 }
 
+// FieldName returns the key for the url.Values lookup.
 func (t Tag) FieldName(fieldName string) string {
 	if t.Alias != "" {
 		fieldName = t.Alias
@@ -23,6 +28,7 @@ func (t Tag) FieldName(fieldName string) string {
 	return fieldName
 }
 
+// ParseTag parses the string of the struct tag into a Tag struct
 func ParseTag(tag string) Tag {
 	if tag == "" {
 		return Tag{}
