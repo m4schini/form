@@ -28,6 +28,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
     r.ParseForm()
     
     user, _ := form.Decode[User](r.Form)
+	
     fmt.Println(user)
 }
 ```
@@ -41,6 +42,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
     r.ParseForm()
 	
     user, _ := decoder.Decode(r.Form)
+	
     fmt.Println(user)
 }
 ```
