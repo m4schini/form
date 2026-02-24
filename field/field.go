@@ -66,37 +66,37 @@ func parserFor(t reflect.Type) (Parser, error) {
 	k := t.Kind()
 	switch k {
 	case reflect.String:
-		return StringDecoder{}, nil
+		return StringParser{}, nil
 	case reflect.Int:
-		return IntDecoder{}, nil
+		return IntParser{}, nil
 	case reflect.Uint:
-		return UintDecoder{}, nil
+		return UintParser{}, nil
 	case reflect.Int8:
-		return Int8Decoder{}, nil
+		return Int8Parser{}, nil
 	case reflect.Uint8:
-		return Uint8Decoder{}, nil
+		return Uint8Parser{}, nil
 	case reflect.Int16:
-		return Int16Decoder{}, nil
+		return Int16Parser{}, nil
 	case reflect.Uint16:
-		return Uint16Decoder{}, nil
+		return Uint16Parser{}, nil
 	case reflect.Int32:
-		return Int32Decoder{}, nil
+		return Int32Parser{}, nil
 	case reflect.Uint32:
-		return Uint32Decoder{}, nil
+		return Uint32Parser{}, nil
 	case reflect.Int64:
-		return Int64Decoder{}, nil
+		return Int64Parser{}, nil
 	case reflect.Uint64:
-		return Uint64Decoder{}, nil
+		return Uint64Parser{}, nil
 	case reflect.Bool:
-		return BoolDecoder{}, nil
+		return BoolParser{}, nil
 	case reflect.Float32:
-		return Float32Decoder{}, nil
+		return Float32Parser{}, nil
 	case reflect.Float64:
-		return Float64Decoder{}, nil
+		return Float64Parser{}, nil
 	case reflect.Complex64:
-		return Complex64Decoder{}, nil
+		return Complex64Parser{}, nil
 	case reflect.Complex128:
-		return Complex128Decoder{}, nil
+		return Complex128Parser{}, nil
 	case reflect.Array:
 		return nil, CannotParseErr{Kind: k}
 	case reflect.Slice:
