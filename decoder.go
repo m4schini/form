@@ -8,6 +8,7 @@ import (
 	"codeberg.org/aur0ra/form/field"
 )
 
+// Decoder manages the fields to decode url.Values into T
 type Decoder[T any] struct {
 	fields []field.Field
 }

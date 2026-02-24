@@ -8,6 +8,7 @@ import (
 	field "codeberg.org/aur0ra/form/field"
 )
 
+// Decode initiates a new decoder and decodes values into struct T
 func Decode[T any](values url.Values) (decoded T, err error) {
 	d, err := NewDecoder[T]()
 	if err != nil {
@@ -17,6 +18,7 @@ func Decode[T any](values url.Values) (decoded T, err error) {
 	return d.Decode(values)
 }
 
+// Encode T into url.Values
 func Encode[T any](form T) url.Values {
 	t := reflect.TypeFor[T]()
 	v := reflect.ValueOf(form)
