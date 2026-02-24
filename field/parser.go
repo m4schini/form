@@ -5,8 +5,11 @@ import (
 	"strconv"
 )
 
-// Parser converts a string into a type. Which type is controlled by the implementation of the Parser.
+// Parser converts a string into a type.
+// Which type is controlled by the implementation of the Parser.
+// Parser must always return the same type.
 type Parser interface {
+	// Parse converts a string into a type.
 	Parse(field string) (any, error)
 }
 
