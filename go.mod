@@ -1,3 +1,3 @@
 module codeberg.org/aur0ra/form
 
-go 1.25
+go 1.26
